@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+<script src="app.js"></script>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="resources/css/slider.css">
+    <script src="resources/js/slider.js"></script>
+
+<style>
+input {
+  border:0px;
+  text-align: center;
+  width:100%;
+  background:transparent;
+}
+form input{
+border:1px solid black;
+width:75%;
+max-width:175px;}
+table tbody td:nth-child(5),table thead th:nth-child(5){
+  width:65px;
+}
+table tbody td:nth-child(4),table thead th:nth-child(4){
+  width:65px;
+}
+table tbody td:nth-child(2),table thead th:nth-child(2){
+  width:65px;
+}
+table tbody td:nth-child(3),table thead th:nth-child(3){
+  width:65px;
+}
+
+ul li img{width:100%;}
+.row{max-width:100%;}
+
+@media screen and (max-width: 300px) {
+    body {
+        background-color: lightblue;
+    }
+}
+.quickEntry input{
+width:14%;
+}
+</style>
+</head>
+<body style="overflow:hidden">
+<div class="content" ng-app="TabletopApp">
+<div ng-controller="combatController">
+<div class="col-md-2 col-sm-2 hidden-xs" style="overflow:auto;float:right;height:100vh">
+	<form autocomplete="off" class=" col-md-2 col-sm-2 hidden-xs" style="position:fixed;padding-left: 0px;"><input type="text" ng-model="mfilter.name" style="width: 94%;border:1px solid black;background-color:white;max-width:100%;" autocomplete="off" /></form>
+    <ul ng-repeat="monster in monsters | filter:mfilter"  class="list-unstyled">
+      <li style="text-align:center;"><img ng-dblclick="addComb(monster)" src="images/{{monster.name}}.jpg" ><br> {{monster.name}} <small style="font-size:70%">(CR{{monster.cr}})</small></li>
+    </ul>
+	</div>
+<div class="row">
+<div class="col-md-10 col-sm-10" style="height:50vh;overflow:auto;">
+  <table class="combatant table table-striped">
+   <thead> <tr>
+      <th>Name</th>
+      <th style="text-align:center;">AC</th>
+      <th style="text-align:center;">HP</th>
+      <th style="text-align:center;">Init</th>
+      <th style="text-align:center;">Round</th>
+      <th></th>
+      <th></th>
+    </tr></thead>
+    <tr ng-repeat="combatant in combatants">
+      <td>{{combatant.name}}</td>
+      <td><input type="number" ng-model="combatant.ac" ng-change="order()"></td>
+      <td><input type="number" ng-model="combatant.hp" ng-change="order()"></td>
+      <td><input type="number" ng-model="combatant.init" ng-change="order()"></td>
+      <td><input type="number" ng-model="combatant.turn" ng-change="order()"></td>
+      <td>
+      <select type="text"  ng-model="combatant.catt" ng-options="attack as attack.aname for attack in combatant.attacks" >
+      <option value="">Select Attack</option>
+      </select>
+      <button type="button" ng-click="Action(combatant.name,combatant.catt,'d')" class="btn btn-default ">
+      <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span> 
+      </button>
+      <button type="button" ng-click="Action(combatant.name,combatant.catt)" class="btn btn-default ">
+      <span class="glyphicon glyphicon-minus" aria-hidden="true"></span> 
+      </button>
+      <button type="button"ng-click="Action(combatant.name,combatant.catt,'a')" class="btn btn-default ">
+      <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span> 
+      </button>
+      </td>
+      <td>
+      <select type="text"  ng-model="combatant.cskill" ng-options="skill as skill.aname for skill in combatant.skills" >
+      <option value="">Select Skill</option>
+      </select>
+      <button type="button" ng-click="Action(combatant.name,combatant.cskill,'d')" class="btn btn-default ">
+      <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span> 
+      </button>
+      <button type="button" ng-click="Action(combatant.name,combatant.cskill)" class="btn btn-default ">
+      <span class="glyphicon glyphicon-minus" aria-hidden="true"></span> 
+      </button>
+      <button type="button"ng-click="Action(combatant.name,combatant.cskill,'a')" class="btn btn-default ">
+      <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span> 
+      </button>
+</td>
+    </tr>
+	<tfoot><tr><td colspan="4"></td></tr> </tfoot>
+  </table>
+   <form class="quickEntry">
+   quick entry
+   <input type="text" ng-model="newName" placeholder="name">
+  <input type="text" ng-model="newHP" placeholder="hp">
+  <input type="text" ng-model="newInit" placeholder="initiative">
+  <input type="text" ng-model="newAttack" placeholder="attack">
+  <input type="text" ng-model="newDamage" placeholder="damage">
+  <input type="submit" ng-click="addComb({'name':newName,'hp':newHP,'init':newInit,'attacks':[{'name':newName,'aname':'Quick Attack','bonus':newAttack,'damage':newDamage}]})">
+</form>
+  </div>
+  <div class="col-md-10 col-sm-10" style="height:20vh;">
+  <textarea type="text" ng-model="combatLog" style="width:100%;height:95%">Log</textarea>
+</div>
+  <div ng-controller="playSceneController" class="col-md-10 col-sm-10" style="min-height:138px;overflow:auto;height:30vh">
+  
+      <ul ng-repeat="(key, scenes) in sceneList | orderBy:key"  class="list-unstyled" style="display:inline-block;margin-top:15px;">
+      <li style="text-align:center;"><img src="{{scenes.SceneIMG}}" style="height:128px;width:auto;border-radius:5px;margin-left:10px;" data-ng-click="toggleScene(key)" /></li>
+    </ul>
+	
+<span my-current-time="format" style="display:none;"></span>
+
+  </div>
+  </div>
+
+  </div>
+
+
+</div>
+</body>
